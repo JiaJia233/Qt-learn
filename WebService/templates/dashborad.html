@@ -1,0 +1,355 @@
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Pi Dashboard</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <!--script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts-more.js"></script>
+    <script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script
+
+    <script src="/static/js/highcharts.js"></script>
+    <script src="/static/js/highcharts-more.js"></script>
+    <script src="/static/js/solid-gauge.js"></script>
+    <script src="/static/js/exporting.js"></script>
+  <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/jquery-3.1.1.min.js"></script>-->
+    <script language="JavaScript">
+    var t
+    var ajax = null;
+    function createXMLHttpRequest(){
+        var request = false;
+        //一般先判断非IE浏览器
+        //window对象中有XMLHttpRequest存在就是非IE，包括（IE7，IE8）
+        if(window.XMLHttpRequest){
+            request=new XMLHttpRequest();//非IE以及IE7，IE8浏览器
+            if(request.overrideMimeType){
+                request.overrideMimeType("text/xml");//重置mime类型
+            }
+        //window对象中有ActiveXObject属性存在就是IE浏览器的低版本
+    }else if(window.ActiveXObject){
+        var versions = ['Microsoft.XMLHTTP',
+                    'MSXML.XMLHTTP',
+                    'Msxml2.XMLHTTP.7.0',
+                    'Msxml2.XMLHTTP.6.0',
+                    'Msxml2.XMLHTTP.5.0',
+                    'Msxml2.XMLHTTP.4.0',
+                    'MSXML2.XMLHTTP.3.0',
+                    'MSXML2.XMLHTTP'];//各种IE浏览器创建Ajax对象时传递的参数
+              for(var i=0; i<versions.length; i++){
+                    try{
+                        request=new ActiveXObject(versions[i]);//各个IE浏览器版本的参数不同
+                        if(request){
+                            return request;
+                        }
+                    }catch(e){
+                        request=false;
+                    }
+               }
+        }
+         return request;
+    }
+// 注意：必须把创建ajax对象的代码放在show函数里，确保每次点击的时候都创建一个新的ajax对象。
+
+    function show()
+    {
+       ajax = createXMLHttpRequest();
+       alert(ajax);
+    }
+
+    function loadXMLDoc()
+    {
+        var xmlhttp,xmlhttp1;
+        xmlhttp=createXMLHttpRequest();
+        xmlhttp1=createXMLHttpRequest();
+
+        xmlhttp.onreadystatechange=function()
+        {
+            if (xmlhttp.readyState==4 && xmlhttp.status==200)
+            {
+                //document.getElementById("time").innerHTML=xmlhttp.responseText;
+                var jsonStr=xmlhttp.responseText;
+                var obj = eval('(' + jsonStr + ')');
+                document.getElementById("time").innerHTML=obj.time;
+                document.getElementById("hostip").innerHTML=obj.ip;
+                document.getElementById("uptime").innerHTML=obj.dt;
+                document.getElementById("user").innerHTML=obj.user;
+
+                document.getElementById("cpu-temp").innerHTML=obj.cuptemp;
+                document.getElementById("cpu-stat-idl").innerHTML=obj.idle;
+                document.getElementById("cpu-stat-use").innerHTML=obj.user;
+                document.getElementById("cpu-stat-nic").innerHTML=obj.nice;
+                document.getElementById("cpu-stat-sys").innerHTML=obj.system;
+                document.getElementById("cpu-stat-iow").innerHTML=obj.iowait;
+                document.getElementById("cpu-stat-irq").innerHTML=obj.irq;
+                document.getElementById("cpu-stat-sirq").innerHTML=obj.softirq;
+                document.getElementById("cpu-count").innerHTML=obj.cpucount;
+                document.getElementById("cpu-freq").innerHTML=obj.cpuq
+                document.getElementById("loadavg-running").innerHTML=obj.wt
+
+                document.getElementById("mem-real-percent").innerHTML=obj.memused
+                document.getElementById("mem-real-free").innerHTML=obj.memfree
+                document.getElementById("mem-cache-percent").innerHTML=obj.memcached
+                document.getElementById("mem-buffers").innerHTML=obj.membuffers
+
+                document.getElementById("mem-swap-percent").innerHTML=obj.swapused
+                document.getElementById("mem-swap-free").innerHTML=obj.swapfree
+
+                document.getElementById("disk-percent").innerHTML=obj.diskused
+                document.getElementById("disk-free").innerHTML=obj.diskfree
+
+                document.getElementById("net-interface-2-total-in").innerHTML=obj.netin
+                document.getElementById("net-interface-2-total-out").innerHTML=obj.netout
+            }
+        }
+        xmlhttp.open("GET","/getvar?"+new Date().getTime(),true);
+        xmlhttp.send();
+
+        xmlhttp1.onreadystatechange=function()
+        {
+            if (xmlhttp1.readyState==4 && xmlhttp1.status==200)
+            {
+                document.getElementById("container-proc").innerHTML=xmlhttp1.responseText;
+            }
+        }
+        xmlhttp1.open("GET","/getproc?"+new Date().getTime(),true);
+        xmlhttp1.send();
+    }
+
+    function autorun() {
+
+        t= setInterval("loadXMLDoc()", 1000);
+    }
+    </script>
+    <style type="text/css">
+        .label {color: #999999; font-size: 75%; font-weight: bolder;}
+    </style>
+</head>
+<body onload="autorun()">
+<from>
+<div id="app">
+    <nav class="navbar navbar-default">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">控制中心:</a>
+                <a class="navbar-brand" href="/">数据板</a>
+                <a class="navbar-brand" href="/dashborad">仪表板</a>
+                <a class="navbar-brand" href="/data">称重数据</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a target="_blank" href="http://www.zonjli.com">江西众加利</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a target="_blank" href="http://www.zonjli.com">Zonics</a></li>
+                            <li><a target="_blank" href=""></a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <div style="text-align: center; padding: 20px 0;"><img src= "/static/img/zjl.png"/></div>
+                <div style="background-color: #E0E0E0; padding: 5px; border-radius: 3px;">
+                    <div class="text-center" style="margin:20px; padding: 10px 0 10px 0; background-color:#CEFCA3; border-radius: 3px;"><div class="label">IP</div><div id="hostip" style="font-size: 150%; font-weight: bolder;">xxx.xxx.xxx.xxx</div></div>
+                    <div class="text-center" style="margin:20px; padding: 10px 0 10px 0; background-color:#9DCFFB; border-radius: 3px;"><div class="label">TIME</div><div id="time" style="font-size: 150%; font-weight: bolder;"></div><div id="date">-</div></div>
+                    <div class="text-center" style="margin:20px; padding: 10px 0 10px 0; background-color:#FFFECD; border-radius: 3px;"><div class="label">UPTIME</div><div id="uptime" style="font-size: 120%; font-weight: bolder;">0</div></div>
+                    <div class="text-center" style="margin:20px; padding: 10px 0 10px 0; background-color:#FAFAFA; border-radius: 3px;"><div class="label">USER</div><div id="user" style="font-size: 120%; font-weight: bolder;">0</div></div>
+                    <div class="text-center" style="margin:20px; padding: 10px 0 10px 0; background-color:#FAFAFA; border-radius: 3px;"><div class="label">OS</div><div id="os" style="font-size: 120%; font-weight: bolder;">0</div></div>
+                    <div class="text-center" style="margin:20px; padding: 10px 0 10px 0; background-color:#FAFAFA; border-radius: 3px;"><div class="label">HOSTNAME</div><div id="hostname" style="font-size: 110%; font-weight: bolder;">0</div></div>
+                    <div class="text-center" style="margin:20px; padding: 10px 0 10px 0; background-color:#FAFAFA; border-radius: 3px;"><div id="uname" style="word-break:break-all; word-wrap:break-word; font-size: 12px; color: #999999; padding: 0 10px;">0</div></div>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="row">
+                    <div class="col-md-6 col-sm-6">
+                        <!--<div id="container-cpu" style="width: 100%; height: 200px;"></div>-->
+                        <div style="height: 200px;">
+                            <div class="row" style="margin: 0; background-color:#E0E0E0;">
+                                <div class="text-center" style="padding: 2px 0 2px 0; background-color: #CDFD9F;"><strong><small>CPU</small></strong></div>
+                                <div class="col-md-3 col-sm-3 col-xs-3" style="padding: 0;">
+                                    <div class="text-center" style="padding: 10px 0 10px 0; background-color:#FFFECD;"><span id="cpu-freq" style="font-weight: bolder;"></span>%<br /><small class="label">MHz</small></div>
+                                </div>
+                                <div class="col-md-3 col-sm-3 col-xs-3" style="padding: 0;">
+                                    <div class="text-center" style="padding: 10px 0 10px 0;"><span id="cpu-count">0</span><br /><small class="label">CORE</small></div>
+                                </div>
+                                <div class="col-md-3 col-sm-3 col-xs-3" style="padding: 0;">
+                                    <div class="text-center" style="padding: 10px 0 10px 0; background-color:#FDCCCB;"><span id="cpu-temp" style="font-weight: bolder;">0</span><br /><small class="label">C°</small></div>
+                                </div>
+                                <div class="col-md-3 col-sm-3 col-xs-3" style="padding: 0;">
+                                    <div class="text-center" style="padding: 10px 0 10px 0; background-color:#9BCEFD;"><span id="cpu-stat-idl">0</span><br /><small class="label">IDLE</small></div>
+                                </div>
+                                <div class="col-md-2 col-sm-2 col-xs-2" style="padding: 0;">
+                                    <div class="text-center" style="padding: 10px 0 10px 0; background-color:#9BCEFD;"><span id="cpu-stat-use">0</span><br /><small class="label">USER</small></div>
+                                </div>
+                                <div class="col-md-2 col-sm-2 col-xs-2" style="padding: 0;">
+                                    <div class="text-center" style="padding: 10px 0 10px 0; background-color:#9BCEFD;"><span id="cpu-stat-sys">0</span><br /><small class="label">SYS</small></div>
+                                </div>
+                                <div class="col-md-2 col-sm-2 col-xs-2" style="padding: 0;">
+                                    <div class="text-center" style="padding: 10px 0 10px 0; background-color:#9BCEFD;"><span id="cpu-stat-nic"></span><br /><small class="label">NICE</small></div>
+                                </div>
+                                <div class="col-md-2 col-sm-2 col-xs-2" style="padding: 0;">
+                                    <div class="text-center" style="padding: 10px 0 10px 0; background-color:#9BCEFD;"><span id="cpu-stat-iow">0</span><br /><small class="label">IOW</small></div>
+                                </div>
+                                <div class="col-md-2 col-sm-2 col-xs-2" style="padding: 0;">
+                                    <div class="text-center" style="padding: 10px 0 10px 0; background-color:#9BCEFD;"><span id="cpu-stat-irq">0</span><br /><small class="label">IRQ</small></div>
+                                </div>
+                                <div class="col-md-2 col-sm-2 col-xs-2" style="padding: 0;">
+                                    <div class="text-center" style="padding: 10px 0 10px 0; background-color:#9BCEFD;"><span id="cpu-stat-sirq">0</span><br /><small class="label">SIRQ</small></div>
+                                </div>
+                                <div class="col-md-12" style="min-height: 52px;">
+                                    <div class="text-center" style="padding: 10px 0 10px 0; margin: auto 0;"><span id="cpu-model" class="label">100</span>&nbsp;</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-6">
+                        <!--<div id="container-mem" style="width: 100%; height: 200px;"></div>-->
+                        <div style="height: 200px;">
+                            <div class="row" style="margin: 0; background-color:#E0E0E0;">
+                                <div class="text-center" style="padding: 2px 0 2px 0; background-color: #CDFD9F;"><strong><small>Weighting</small></strong></div>
+                               <!-- <div class="col-md-6 col-sm-6 col-xs-6" style="padding: 0;">
+                                    <div class="text-center" style="padding: 10px 0 10px 0;"><span id="mem-percent">0</span>%<br /><small class="label">USED</small></div>
+                                    <div class="text-center" style="padding: 10px 0 10px 0; background-color: #CDFD9F;"><span id="mem-free">0</span>MB<br /><small class="label">FREE</small></div>
+                                </div>
+                                <div class="col-md-6 col-sm-6 col-xs-6" style="padding: 0;">
+                                    <div class="text-center" style="padding: 10px 0 10px 0; background-color: #CEFFFF;"><span id="mem-cached">0</span>MB<br /><small class="label">CACHED</small></div>
+                                    <div class="text-center" style="padding: 10px 0 10px 0; background-color: #CCCDFC;"><span id="mem-swap-total">0</span>MB<br /><small class="label">SWAP</small></div>
+                                </div>
+                                <div class="col-md-3 col-sm-3 col-xs-3" style="padding: 0;">
+                                    <div class="text-center" style="padding: 10px 0 10px 0;"><span id="loadavg-1m">0.0</span><br /><small class="label">AVG.1M</small></div>
+                                </div>
+                                <div class="col-md-3 col-sm-3 col-xs-3" style="padding: 0;">
+                                    <div class="text-center" style="padding: 10px 0 10px 0;"><span id="loadavg-5m">0.0</span><br /><small class="label">AVG.5M</small></div>
+                                </div>
+                                <div class="col-md-3 col-sm-3 col-xs-3" style="padding: 0;">
+                                    <div class="text-center" style="padding: 10px 0 10px 0;"><span id="loadavg-10m">0.0</span><br /><small class="label">AVG.10M</small></div>
+                                </div>-->
+                                <div class="col-md-12 col-sm-6 col-xs-12" style="padding: 0;">
+                                    <div class="text-center" style="padding: 10px 0 10px 0; background-color: #FFFDCF;"><strong><span id="loadavg-running">0</span>/<span id="loadavg-threads">0</span></strong><br /><small class="label">RUNNING</small></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3 col-sm-3 col-xs-6">
+                        <!--<div id="container-cache" style="width: 100%; height: 100px;"></div>-->
+                        <div style="height: 90px;">
+                            <div class="row" style="margin: 0; background-color:#E0E0E0;">
+                                <div class="text-center" style="padding: 2px 0 2px 0; background-color: #CEFFFF;"><strong><small>CACHE</small></strong></div>
+                                <div class="col-md-6 col-sm-6 col-xs-6" style="padding: 0;">
+                                    <div class="text-center" style="padding: 10px 0 10px 0;"><span id="mem-cache-percent">MB</span><br /><small class="label">USED</small></div>
+                                </div>
+                                <div class="col-md-6 col-sm-6 col-xs-6" style="padding: 0; background-color:#CEFFFF;">
+                                    <div class="text-center" style="padding: 10px 0 10px 0;"><span id="mem-buffers">0</span>MB<br /><small class="label">BUFFERS</small></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-3 col-xs-6">
+                        <!--<div id="container-mem-real" style="width: 100%; height: 100px;"></div>-->
+                        <div style="height: 90px;">
+                            <div class="row" style="margin: 0; background-color:#E0E0E0;">
+                                <div class="text-center" style="padding: 2px 0 2px 0; background-color: #CDFD9F;"><strong><small>REAL MEMORY</small></strong></div>
+                                <div class="col-md-6 col-sm-6 col-xs-6" style="padding: 0;">
+                                    <div class="text-center" style="padding: 10px 0 10px 0;"><span id="mem-real-percent">MB</span><br /><small class="label">USED</small></div>
+                                </div>
+                                <div class="col-md-6 col-sm-6 col-xs-6" style="padding: 0; background-color:#CDFD9F;">
+                                    <div class="text-center" style="padding: 10px 0 10px 0;"><span id="mem-real-free">0</span>MB<br /><small class="label">FREE</small></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-3 col-xs-6">
+                        <!--<div id="container-swap" style="width: 100%; height: 100px;"></div>-->
+                        <div style="height: 90px;">
+                            <div class="row" style="margin: 0; background-color:#E0E0E0;">
+                                <div class="text-center" style="padding: 2px 0 2px 0; background-color: #CCCDFC;"><strong><small>SWAP</small></strong></div>
+                                <div class="col-md-6 col-sm-6 col-xs-6" style="padding: 0;">
+                                    <div class="text-center" style="padding: 10px 0 10px 0;"><span id="mem-swap-percent">0</span>MB<br /><small class="label">USED</small></div>
+                                </div>
+                                <div class="col-md-6 col-sm-6 col-xs-6" style="padding: 0; background-color:#CCCDFC;">
+                                    <div class="text-center" style="padding: 10px 0 10px 0;"><span id="mem-swap-free">0</span>MB<br /><small class="label">FREE</small></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-3 col-xs-6">
+                        <!--<div id="container-disk" style="width: 100%; height: 100px;"></div>-->
+                        <div style="height: 90px;">
+                            <div class="row" style="margin: 0; background-color:#E0E0E0;">
+                                <div class="text-center" style="padding: 2px 0 2px 0; background-color: #9BCEFD;"><strong><small>DISK</small></strong></div>
+                                <div class="col-md-6 col-sm-6 col-xs-6" style="padding: 0;">
+                                    <div class="text-center" style="padding: 10px 0 10px 0;"><span id="disk-percent">0</span>GB<br /><small class="label">USED</small></div>
+                                </div>
+                                <div class="col-md-6 col-sm-6 col-xs-6" style="padding: 0; background-color:#9BCEFD;">
+                                    <div class="text-center" style="padding: 10px 0 10px 0;"><span id="disk-free">0</span>GB<br /><small class="label">FREE</small></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-md-12">
+
+                            <div class="row" style="margin: 0;">
+                                <div class="col-md-10 col-sm-10 col-xs-10" style="padding: 0;">
+                                    <div id="container-proc" style="min-width: 100%; height: 150px; margin: 20px auto">
+                                        <!--<table border="1" width="600">
+                                            <tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td></tr>
+                                            <tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td></tr>
+                                            <tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td></tr>
+                                            <tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td></tr>
+                                        </table>-->
+                                    </div>
+                                </div>
+                                <div class="col-md-2 col-sm-2 col-xs-2" style="padding: 0;">
+                                    <div style="height: 80px; margin-top: 10px;">
+                                        <div class="text-center" style="padding: 2px 0 2px 0; background-color: #CCCCCC;"><strong><span id="net-interface-2-name"></span>NET</strong></div>
+                                        <div class="text-center" style="padding: 10px 0 10px 0; background-color: #9BCEFD;"><span id="net-interface-2-total-in">100</span>MB<br /><small class="label">IN</small></div>
+                                        <div class="text-center" style="padding: 10px 0 10px 0; background-color: #CDFD9F;"><span id="net-interface-2-total-out">100</span>MB<br /><small class="label">OUT</small></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div id="footer">
+                    <hr style="margin: 20px 0 10px 0;" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</from>
+<!--<script src="/static/js/dashboard.min.js"></script>-->
+</body>
+</html>

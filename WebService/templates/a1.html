@@ -1,0 +1,176 @@
+<div>
+<head>
+    <meta charset="UTF-8"/>
+    <title>Inquiry Data</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <script src="/static/js/jquery-3.1.1.min.js"></script>
+    <script language="JavaScript">
+        function Submit_Data()
+        {
+            if (document.activeElement.value == "报表查询") {
+                if(document.getElementById("OK").checked || document.getElementById("NG").checked) {
+                    var starttime = document.getElementById("StartTime").value;
+                    var endtime = document.getElementById("EndTime").value;
+                    if (starttime != "" && endtime != "") {
+                        if (starttime < endtime) {
+                            return true;
+                        }
+                        else {
+                            alert("请注意截至日期不能比起始日期早!");
+                            return false;
+                        }
+                    } else {
+                        alert("请选择查询时间!");
+                        return false;
+                    }
+                } else {
+                    alert("请选择车辆状态!");
+                    return false;
+                }
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        function Load_Image(obj)
+        {
+            var x = $(obj).parent().parent().find("td");
+            var y = x.eq(8).text();
+            var z = x.eq(0).text().substring(0, 10).replace(/-/g, "");
+            document.getElementById("imgCarNo").src="/static/img/" + z + "/"+ y;
+        }
+    </script>
+    <style type="text/css">
+        .label {color: #999999; font-size: 75%; font-weight: bolder;}
+    </style>
+</head>
+    <div id="app">
+        <nav class="navbar navbar-default">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">控制中心:</a>
+                    <a class="navbar-brand" href="/">数据板</a>
+                    <a class="navbar-brand" href="/dashborad">仪表板</a>
+                    <a class="navbar-brand" href="/data">称重数据</a>
+                </div>
+
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a target="_blank" href="http://www.zonjli.com">江西众加利</a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><span class="caret"></span></a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a target="_blank" href="http://www.zonjli.com">Zonics</a></li>
+                                <li><a target="_blank" href=""></a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    <div class="container">
+        <div class="row">
+        <div class="col-md-12" style="margin-left: 0;">
+            <div class="row">
+                <div class="col-md-4 col-sm-6">
+                <!--<div id="container-cpu" style="width: 100%; height: 200px;"></div>-->
+                    <div style="height: 300px;">
+                        <div class="row" style="margin: 0; background-color:#E0E0E0; width:100%; height:100%; margin-left: -4.1%;">
+                            <div class="text-center" style="padding: 2px 0 2px 0; background-color: #CDFD9F;"><strong><small>查询条件</small></strong></div>
+                            <div class="col-md-12" style="min-height: 52px;">
+                                <div class="text-left" style="padding: 10px 0 10px 10px; margin: auto 0;" id="bizwt">
+                                <form action="" method="post" onsubmit="return Submit_Data()">
+                                     起始日期:&emsp;&emsp;&emsp;&emsp;<input type = "date" id = "StartTime" name = "start" value=""/><br><br><br>
+                                     截至日期:&emsp;&emsp;&emsp;&emsp;<input type = "date" id = "EndTime" name = "end"/><br>
+                                  	 (IE用户需手动输入时间, 格式为: 2019-04-01)<br><br>
+                                     车辆状态:&emsp;&emsp;&emsp;&emsp;<input type = "radio" id = "OK" name = "state" value = "0" />正常&emsp;&emsp;&emsp;<input type = "radio" id = "NG" name = "state" value = "1" />超限<br><br><br>
+                                        <input name="submit" type="submit" id="submit" value="报表查询" onclick="javascript:this.form.action='/data'">
+                                        &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+                                        <input type = "submit" name = "submit" id="submit" value = "报表下载" onclick="javascript:this.form.action='/filedownload'"/>
+                                </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4" style="margin-left: -2.5%;">
+                    <!--<div id="container-mem" style="width: 100%; height: 200px;"></div>-->
+                    <div style="height: 300px;">
+                        <div class="row" style="margin: 0;">
+                            <div class="col-md-10" style="margin-left: -6%; background-color:#ffffff;">
+                                <div class="text-left" style="padding: 0px 0 0px 0;"><img id="imgFront" src="/static/img/img.png " height="150" width="275" alt="图片不存在或已删除"></div>
+                                <div class="text-left" style="padding: 0px 0 0px 0;"><img id="imgBack" src="/static/img/zjl.png " height="150" width="275" alt="图片不存在或已删除"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5" style="margin-left: 0 ; margin-left: -7.1%;">
+                    <!--<div id="container-mem" style="width: 100%; height: 200px;"></div>-->
+                    <div style="height: 300px;">
+                        <div class="row" style="margin: 0; ">
+                            <div class="col-md-15" style="padding: 0; background-color:#FFD1A4; margin-left: -6%;">
+                                <div class="text-left" style="padding: 0px 0 0px 0;"><img id="imgCarNo" src="/static/img/kk.png " height="300" width="485" alt="图片不存在或已删除"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12" style="margin-left: -1.3%;">
+                    <div class="row" id="bizwtlist" style="margin:0px; padding: 10px 0 10px 0; background-color:#CEFCA3; border-radius: 3px; ">
+                        <table class="mytable" border="1" width="100%" align="center">
+                            <thead>
+                            <tr>
+                                <th align="center">日期</th>
+                                <th align="center">车牌</th>
+                                <th align="center">超限状态</th>
+                                <th align="center">轴型</th>
+                                <th align="center">限重</th>
+                                <th align="center">重量</th>
+                                <th align="center">超重量</th>
+                                <th align="center">超重率</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for i in u %}
+                                <tr>
+                                    <td><a hef="#" onclick="Load_Image(this)">{{ i["f_date"] }}</a></td>
+                                    <td><a hef="#" onclick="Load_Image(this)">{{ i["f_carno"] }}</a></td>
+                                    <td><a hef="#" onclick="Load_Image(this)">{{ i["f_state"] }}</a></td>
+                                    <td><a hef="#" onclick="Load_Image(this)">{{ i["f_axis"] }}</a></td>
+                                    <td><a hef="#" onclick="Load_Image(this)">{{ i["f_wtlimit"] }}</a></td>
+                                    <td><a hef="#" onclick="Load_Image(this)">{{ i["f_wt"] }}</a></td>
+                                    <td><a hef="#" onclick="Load_Image(this)">{{ i["f_overload"] }}</a></td>
+                                    <td><a hef="#" onclick="Load_Image(this)">{{ i["f_transrate"] }}</a></td>
+                                    <td style="display: none">{{ i["f_imgpath"] }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+      </div>
+  </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div id="footer">
+                    <hr style="margin: 20px 0 10px 0;" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,205 @@
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Pi Dashboard</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <script language="JavaScript">
+    var t
+    var ajax = null;
+    function createXMLHttpRequest(){
+        var request = false;
+        //一般先判断非IE浏览器
+        //window对象中有XMLHttpRequest存在就是非IE，包括（IE7，IE8）
+        if(window.XMLHttpRequest){
+            request=new XMLHttpRequest();//非IE以及IE7，IE8浏览器
+            if(request.overrideMimeType){
+                request.overrideMimeType("text/xml");//重置mime类型
+            }
+        //window对象中有ActiveXObject属性存在就是IE浏览器的低版本
+    }else if(window.ActiveXObject){
+        var versions = ['Microsoft.XMLHTTP',
+                    'MSXML.XMLHTTP',
+                    'Msxml2.XMLHTTP.7.0',
+                    'Msxml2.XMLHTTP.6.0',
+                    'Msxml2.XMLHTTP.5.0',
+                    'Msxml2.XMLHTTP.4.0',
+                    'MSXML2.XMLHTTP.3.0',
+                    'MSXML2.XMLHTTP'];//各种IE浏览器创建Ajax对象时传递的参数
+              for(var i=0; i<versions.length; i++){
+                    try{
+                        request=new ActiveXObject(versions[i]);//各个IE浏览器版本的参数不同
+                        if(request){
+                            return request;
+                        }
+                    }catch(e){
+                        request=false;
+                    }
+               }
+        }
+         return request;
+    }
+// 注意：必须把创建ajax对象的代码放在show函数里，确保每次点击的时候都创建一个新的ajax对象。
+
+    function show()
+    {
+       ajax = createXMLHttpRequest();
+       alert(ajax);
+    }
+
+    function loadXMLDoc()
+    {
+        var xmlhttp,xmlhttp1;
+        xmlhttp=createXMLHttpRequest();
+        xmlhttp1=createXMLHttpRequest();
+
+        xmlhttp.onreadystatechange=function()
+        {
+            if (xmlhttp.readyState==4 && xmlhttp.status==200)
+            {
+                var jsonStr=xmlhttp.responseText;
+                var obj = eval('(' + jsonStr + ')');
+                document.getElementById("time").innerHTML=obj.time;
+                document.getElementById("hostip").innerHTML=obj.ip;
+                document.getElementById("uptime").innerHTML=obj.dt;
+                document.getElementById("user").innerHTML=obj.user;
+
+                document.getElementById("os").innerHTML="使用:"+obj.diskused+"GB<br>"+"空闲:"+obj.diskfree+"GB";
+                document.getElementById("hostname").innerHTML=obj.cuptemp;
+            }
+        }
+        xmlhttp.open("GET","/getvar?"+new Date().getTime(),true);
+        xmlhttp.send();
+
+        xmlhttp1.onreadystatechange=function()
+        {
+            if (xmlhttp1.readyState==4 && xmlhttp1.status==200)
+            {
+                var Str=xmlhttp1.responseText.split('|');
+                document.getElementById("bizwt").innerHTML=Str[0];
+                document.getElementById("bizwtlist").innerHTML=Str[2];
+                document.getElementById("imgx").src = "/static/img/"+Str[1];
+            }
+        }
+        xmlhttp1.open("GET","/getwtdata?"+new Date().getTime(),true);
+        xmlhttp1.send();
+    }
+
+    function autorun() {
+
+        t= setInterval("loadXMLDoc()", 1000);
+    }
+    </script>
+    <style type="text/css">
+        .label {color: #999999; font-size: 75%; font-weight: bolder;}
+    </style>
+</head>
+<body onload="autorun()">
+<from>
+<div id="app">
+    <nav class="navbar navbar-default">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">控制中心:</a>
+                <a class="navbar-brand" href="/">数据板</a>
+                <a class="navbar-brand" href="/dashborad">仪表板</a>
+                <a class="navbar-brand" href="/data">称重数据</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a target="_blank" href="http://www.zonjli.com">江西众加利</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a target="_blank" href="http://www.zonjli.com">Zonics</a></li>
+                            <li><a target="_blank" href=""></a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+
+                <div style="background-color: #E0E0E0; padding: 5px; border-radius: 3px;">
+                    <div class="text-center" style="margin:5px; padding: 2px 0 2px 0; background-color:#CEFCA3; border-radius: 3px;"><div class="label">IP地址</div><div id="hostip" style="font-size: 150%; font-weight: bolder;">xxx.xxx.xxx.xxx</div></div>
+                    <div class="text-center" style="margin:20px; padding: 10px 0 10px 0; background-color:#9DCFFB; border-radius: 3px;"><div class="label">时间</div><div id="time" style="font-size: 150%; font-weight: bolder;"></div><div id="date">-</div></div>
+                    <div class="text-center" style="margin:20px; padding: 10px 0 10px 0; background-color:#FFFECD; border-radius: 3px;"><div class="label">开机时间</div><div id="uptime" style="font-size: 120%; font-weight: bolder;">0</div></div>
+                    <div class="text-center" style="margin:20px; padding: 10px 0 10px 0; background-color:#FAFAFA; border-radius: 3px;"><div class="label">用户</div><div id="user" style="font-size: 120%; font-weight: bolder;">0</div></div>
+                    <div class="text-center" style="margin:20px; padding: 10px 0 10px 0; background-color:#FAFAFA; border-radius: 3px;"><div class="label">存储</div><div id="os" style="font-size: 120%; font-weight: bolder;">0</div></div>
+                    <div class="text-center" style="margin:20px; padding: 10px 0 10px 0; background-color:#FAFAFA; border-radius: 3px;"><div class="label">温度</div><div id="hostname" style="font-size: 110%; font-weight: bolder;">0</div></div>
+                    <div class="text-center" style="margin:20px; padding: 10px 0 10px 0; background-color:#FAFAFA; border-radius: 3px;"><div id="uname" style="word-break:break-all; word-wrap:break-word; font-size: 12px; color: #999999; padding: 0 10px;">0</div></div>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="row">
+                    <div class="col-md-6 col-sm-6">
+                        <!--<div id="container-cpu" style="width: 100%; height: 200px;"></div>-->
+                        <div style="height: 200px;">
+                            <div class="row" style="margin: 0; background-color:#E0E0E0;">
+                                <div class="text-center" style="padding: 2px 0 2px 0; background-color: #CDFD9F;"><strong><small>最近一笔数据</small></strong></div>
+
+                                <div class="col-md-12" style="min-height: 52px;">
+                                    <div class="text-left" style="padding: 10px 0 10px 0; margin: auto 0;" id="bizwt">
+                                        车号:<br><br>
+                                        车型:<br><br>
+                                        限载:<br><br>
+                                        实重:<br><br>
+                                        超载:<br><br>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-6">
+                        <!--<div id="container-mem" style="width: 100%; height: 200px;"></div>-->
+                        <div style="height: 200px;">
+                            <div class="row" style="margin: 0; background-color:#E0E0E0;">
+                                <div class="col-md-12 col-sm-6 col-xs-12" style="padding: 0;">
+                                    <div class="text-center" style="padding: 10px 0 10px 0; background-color: #FFFDCF;"><img id="imgx" src="/static/img/zjl.png " height="230" width="340"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+              <div class="row">
+                    <div class="col-md-12">
+                            <div class="row" id="bizwtlist" style="margin:0px; padding: 10px 0 10px 0; background-color:#CEFCA3; border-radius: 3px;">
+                                  <table border="1" width="830">
+                                      <tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td></tr>
+                                      <tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td></tr>
+                                      <tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td></tr>
+                                      <tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td></tr>
+                                  </table>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div id="footer">
+                    <hr style="margin: 20px 0 10px 0;" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</from>
+<!--<script src="/static/js/dashboard.min.js"></script>-->
+</body>
+</html>
