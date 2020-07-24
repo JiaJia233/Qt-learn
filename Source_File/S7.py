@@ -3,6 +3,8 @@ import socket
 import struct
 
 
+#更改测试用
+
 class S7:
 	def __init__(self, ip_addr):
 		self.ip = ip_addr
